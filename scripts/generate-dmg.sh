@@ -35,7 +35,7 @@ mkdir $INSTALLER_FOLDER
 
 echo Configuring the project
 pushd $BUILD_FOLDER
-qmake $SOURCE_ROOT/moonlight-qt.pro QMAKE_APPLE_DEVICE_ARCHS="x86_64 arm64" || fail "Qmake failed!"
+qmake $SOURCE_ROOT/moonlight-qt.pro QMAKE_APPLE_DEVICE_ARCHS="arm64" || fail "Qmake failed!"
 popd
 
 echo Compiling Moonlight in $BUILD_CONFIG configuration
@@ -65,9 +65,9 @@ fi
 
 echo Creating DMG
 if [ "$SIGNING_IDENTITY" != "" ]; then
-  create-dmg $BUILD_FOLDER/app/Moonlight.app $INSTALLER_FOLDER --identity="$SIGNING_IDENTITY" || fail "create-dmg failed!"
+  create-dmg "$INSTALLER_FOLDER/Moonlight $VERSION.dmg" $BUILD_FOLDER/app/Moonlight.app --identity="$SIGNING_IDENTITY" || fail "create-dmg failed!"
 else
-  create-dmg $BUILD_FOLDER/app/Moonlight.app $INSTALLER_FOLDER
+  create-dmg "$INSTALLER_FOLDER/Moonlight $VERSION.dmg" $BUILD_FOLDER/app/Moonlight.app
   case $? in
     0) ;;
     2) ;;
