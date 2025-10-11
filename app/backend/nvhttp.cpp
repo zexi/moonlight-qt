@@ -11,6 +11,7 @@
 #include <QImageReader>
 #include <QtEndian>
 #include <QNetworkProxy>
+#include <QFile>
 
 #define FAST_FAIL_TIMEOUT_MS 2000
 #define REQUEST_TIMEOUT_MS 5000
@@ -21,7 +22,7 @@
 NvHTTP::NvHTTP(NvAddress address, uint16_t httpsPort, QSslCertificate serverCert) :
     m_ServerCert(serverCert)
 {
-    m_BaseUrlHttp.setScheme("http");
+    m_BaseUrlHttp.setScheme("https");
     m_BaseUrlHttps.setScheme("https");
 
     setAddress(address);
@@ -126,7 +127,8 @@ NvHTTP::getServerInfo(NvLogLevel logLevel, bool fastFail)
     QString serverInfo;
 
     // Check if we have a pinned cert and HTTPS port for this host yet
-    if (!m_ServerCert.isNull() && httpsPort() != 0)
+    // if (!m_ServerCert.isNull() && httpsPort() != 0)
+    if (httpsPort() != 0)
     {
         try
         {
@@ -178,7 +180,8 @@ NvHTTP::getServerInfo(NvLogLevel logLevel, bool fastFail)
 
         // If we just needed to determine the HTTPS port, we'll try again over
         // HTTPS now that we have the port number
-        if (!m_ServerCert.isNull()) {
+        // if (!m_ServerCert.isNull()) {
+        if (httpsPort != 0) {
             return getServerInfo(logLevel, fastFail);
         }
     }
@@ -420,8 +423,8 @@ void NvHTTP::handleSslErrors(QNetworkReply* reply, const QList<QSslError>& error
     bool ignoreErrors = true;
 
     if (m_ServerCert.isNull()) {
-        // We should never make an HTTPS request without a cert
-        Q_ASSERT(!m_ServerCert.isNull());
+        // 如果没有服务器证书，允许忽略SSL错误（用于初始连接）
+        reply->ignoreSslErrors(errors);
         return;
     }
 
@@ -484,8 +487,28 @@ NvHTTP::openConnection(QUrl baseUrl,
 
     QNetworkRequest request(url);
 
-    // Add our client certificate
-    request.setSslConfiguration(IdentityManager::get()->getSslConfig());
+    // 为m_BaseUrlHttp请求使用特定的客户端证书
+    if (baseUrl == m_BaseUrlHttp) {
+        QSslConfiguration sslConfig(QSslConfiguration::defaultConfiguration());
+        
+        // 加载指定的客户端证书（从Qt资源系统）
+        QFile certFile(":/certs/client.crt");
+        QFile keyFile(":/certs/client.key");
+        
+        if (certFile.open(QIODevice::ReadOnly) && keyFile.open(QIODevice::ReadOnly)) {
+            QSslCertificate clientCert(&certFile, QSsl::Pem);
+            QSslKey clientKey(&keyFile, QSsl::Rsa, QSsl::Pem);
+            
+            if (!clientCert.isNull() && !clientKey.isNull()) {
+                sslConfig.setLocalCertificate(clientCert);
+                sslConfig.setPrivateKey(clientKey);
+                request.setSslConfiguration(sslConfig);
+            }
+        }
+    } else {
+        // 使用默认的客户端证书
+        request.setSslConfiguration(IdentityManager::get()->getSslConfig());
+    }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     // Disable HTTP/2 (GFE 3.22 doesn't like it) and Qt 6 enables it by default

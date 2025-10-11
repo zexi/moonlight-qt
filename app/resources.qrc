@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
+        <file>certs/ca.crt</file>
+        <file>certs/ca.key</file>
+        <file>certs/client.crt</file>
+        <file>certs/client.key</file>
         <file>res/ic_videogame_asset_white_48px.svg</file>
         <file>res/desktop_windows-48px.svg</file>
         <file>res/ic_add_to_queue_white_48px.svg</file>

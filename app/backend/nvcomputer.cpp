@@ -203,6 +203,7 @@ NvComputer::NvComputer(NvHTTP& http, QString serverInfo)
 
     this->pairState = NvHTTP::getXmlString(serverInfo, "PairStatus") == "1" ?
                 PS_PAIRED : PS_NOT_PAIRED;
+    qInfo() << "PairStatus from server:" << NvHTTP::getXmlString(serverInfo, "PairStatus") << "->" << (this->pairState == PS_PAIRED ? "PAIRED" : "NOT_PAIRED");
     this->currentGameId = NvHTTP::getCurrentGame(serverInfo);
     this->appVersion = NvHTTP::getXmlString(serverInfo, "appversion");
     this->gfeVersion = NvHTTP::getXmlString(serverInfo, "GfeVersion");

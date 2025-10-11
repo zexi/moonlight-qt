@@ -947,6 +947,11 @@ private:
 
                 // Tell our client about this new PC
                 emit computerStateChanged(newComputer);
+                
+                // 总是执行一遍配对逻辑，确保与Sunshine服务端配对
+                qInfo() << "Auto-pairing host:" << newComputer->name;
+                QString pin = m_ComputerManager->generatePinString();
+                m_ComputerManager->pairHost(newComputer, pin);
             }
         }
     }
@@ -969,11 +974,8 @@ void ComputerManager::addNewHost(NvAddress address, bool mdns, NvAddress mdnsIpv
 // TODO: Use QRandomGenerator when we drop Qt 5.9 support
 QString ComputerManager::generatePinString()
 {
-    std::uniform_int_distribution<int> dist(0, 9999);
-    std::random_device rd;
-    std::mt19937 engine(rd());
-
-    return QString::asprintf("%04u", dist(engine));
+    // 使用固定的PIN码6688进行配对，适配Sunshine服务端
+    return QString("6688");
 }
 
 #include "computermanager.moc"
