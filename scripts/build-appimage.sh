@@ -14,7 +14,7 @@ INSTALLER_FOLDER=$BUILD_ROOT/installer-$BUILD_CONFIG
 VERSION=`cat $SOURCE_ROOT/app/version.txt`
 
 command -v qmake >/dev/null 2>&1 || fail "Unable to find 'qmake' in your PATH!"
-command -v linuxdeployqt >/dev/null 2>&1 || fail "Unable to find 'linuxdeployqt' in your PATH!"
+command -v /usr/bin/appimagetool >/dev/null 2>&1 || fail "Unable to find 'appimagetool' in your PATH!"
 
 echo Cleaning output directories
 rm -rf $BUILD_FOLDER
@@ -34,7 +34,7 @@ pushd $BUILD_FOLDER
 # work even in X11. To avoid this, we will disable Wayland support for the AppImage.
 #
 # We disable DRM support because linuxdeployqt doesn't bundle the appropriate libraries for Qt EGLFS.
-qmake $SOURCE_ROOT/moonlight-qt.pro CONFIG+=disable-wayland CONFIG+=disable-libdrm CONFIG+=disable-cuda PREFIX=$DEPLOY_FOLDER/usr DEFINES+=APP_IMAGE || fail "Qmake failed!"
+qmake6 $SOURCE_ROOT/moonlight-qt.pro CONFIG+=disable-wayland CONFIG+=disable-libdrm CONFIG+=disable-cuda PREFIX=$DEPLOY_FOLDER/usr DEFINES+=APP_IMAGE || fail "Qmake failed!"
 popd
 
 echo Compiling Moonlight in $BUILD_CONFIG configuration
@@ -49,7 +49,9 @@ popd
 
 echo Creating AppImage
 pushd $INSTALLER_FOLDER
-VERSION=$VERSION linuxdeployqt $DEPLOY_FOLDER/usr/share/applications/com.moonlight_stream.Moonlight.desktop -qmldir=$SOURCE_ROOT/app/gui -appimage || fail "linuxdeployqt failed!"
+#VERSION=$VERSION linuxdeployqt $DEPLOY_FOLDER/usr/share/applications/com.moonlight_stream.Moonlight.desktop -qmldir=$SOURCE_ROOT/app/gui -appimage || fail "linuxdeployqt failed!"
+QTDIR=/usr/lib/qt6/ /usr/bin/appimagetool -s deploy $DEPLOY_FOLDER/usr/share/applications/com.moonlight_stream.Moonlight.desktop || fail "bundle failed!"
+VERSION=$VERSION /usr/bin/appimagetool $DEPLOY_FOLDER || fail "appimagetool failed!"
 popd
 
 echo Build successful
