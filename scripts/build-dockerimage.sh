@@ -119,6 +119,35 @@ echo "编译平台: $PLATFORMS"
 echo "使用Dockerfile: $FINAL_DOCKERFILE"
 echo "镜像标签: registry.cn-beijing.aliyuncs.com/zexi/$FINAL_IMAGE_NAME:$FINAL_TAG"
 
+echo '.qmake.cache
+        .qmake.stash
+        .vscode/
+        app/Info.plist-e
+        app/Makefile
+        app/Makefile.Debug
+        app/Makefile.Release
+        app/Moonlight.app/
+        app/qml_qmlcache.qrc
+        certs/
+        config.log
+        h264bitstream/Makefile
+        h264bitstream/Makefile.Debug
+        h264bitstream/Makefile.Release
+        h264bitstream/libh264bitstream.a
+        moonlight-common-c/Makefile
+        moonlight-common-c/Makefile.Debug
+        moonlight-common-c/Makefile.Release
+        moonlight-common-c/libmoonlight-common-c.a
+        qmdnsengine/Makefile
+        qmdnsengine/Makefile.Debug
+        qmdnsengine/Makefile.Release
+        qmdnsengine/libqmdnsengine.a
+        soundio/Makefile
+        soundio/Makefile.Debug
+        soundio/Makefile.Release
+        soundio/libsoundio.a
+' | xargs -I{} rm -rf {}
+
 # 执行docker buildx命令
 docker buildx build --platform $PLATFORMS --push \
 	-t registry.cn-beijing.aliyuncs.com/zexi/$FINAL_IMAGE_NAME:$FINAL_TAG \
