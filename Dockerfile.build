@@ -23,3 +23,5 @@ RUN <<_GSTREAMER_INSTALL
     apt-get install -y --no-install-recommends $DEV_PACKAGES
 _GSTREAMER_INSTALL
 
+RUN apt install -y fonts-wqy-zenhei \
+  && rm -rf /var/lib/apt/lists/*

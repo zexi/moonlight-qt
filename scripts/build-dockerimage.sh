@@ -2,8 +2,8 @@
 
 # 默认配置
 REGISTRY="registry.cn-beijing.aliyuncs.com/zexi"
-TAG=20251022.0
-BUILD_TAG="moonlight-qt-build.251022.0"
+TAG=20251023.0
+BUILD_TAG="moonlight-qt-build.251023.0"
 IMAGE_NAME="moonlight-qt"
 BUILD_IMAGE_NAME="ubuntu"
 DOCKERFILE="./Dockerfile"
